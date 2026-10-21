@@ -26,6 +26,8 @@
 - Open decisions resolved: license (MIT), repository name and visibility, dependency tooling.
 - Repository scaffolding: `pyproject.toml`, `src/swarmlab/` skeleton, `tests/`,
   `.github/workflows/ci.yml`, `.gitignore`, `LICENSE`.
+- Verified the documented setup from a clean clone of the published repository: `uv sync
+  --all-extras`, `uv run pytest`, and `uv run ruff check .` all succeed.
 
 ## Not completed
 
@@ -38,8 +40,7 @@
 ## Immediate next actions
 
 1. Approve the Phase 0 exit gate.
-2. Confirm `uv sync --all-extras` and `uv run pytest` from a clean clone.
-3. Begin Phase 1: deterministic formation generators and the linear-trajectory baseline.
+2. Begin Phase 1: deterministic formation generators and the linear-trajectory baseline.
 
 ## Blockers / risks
 

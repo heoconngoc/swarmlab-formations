@@ -87,11 +87,44 @@ This is a lightweight architecture decision record (ADR) log. Decisions may be r
 
 **Consequences:** Contributors install `uv`; `uv sync --all-extras` is the single setup command. `uv.lock` must be regenerated and committed whenever dependencies change.
 
+## D-010 — Phase 1 demo entry point
+
+**Date:** 2026-10-21  
+**Status:** Accepted
+
+**Decision:** The Phase 1 playground is a Python module runner, `swarmlab.experiments.phase1`, reachable as `python -m swarmlab.experiments.phase1` and through the console script `swarmlab-demo`. No notebook is shipped.
+
+**Rationale:** A module runner is importable, testable, and runnable in CI, all three of which a notebook is not. It keeps the experiment reproducible from the command line and lets `tests/` call the same code path a user does. Notebooks were considered and deferred: they are convenient for exploration but add a second, untested entry point.
+
+**Consequences:** The viewer is imported lazily inside the CLI, so `--no-html` runs without Plotly. The phase runner becomes the reference usage example for later phases.
+
+## D-011 — Trajectory time layout
+
+**Date:** 2026-10-21  
+**Status:** Accepted
+
+**Decision:** A trajectory stores `times` with shape `(N, M)` and `positions` with shape `(N, M, 3)`, giving every agent its own row of waypoint times, even while Phase 1 uses a synchronized schedule.
+
+**Rationale:** Phase 4 plans staggered departures, where agents start at different times. With one time row per agent, that phase needs no change to the data structures, and the evaluator or the viewer can already work with per-agent schedules. The alternative, a shared `(M,)` time vector, would have to be replaced later.
+
+**Consequences:** Sampling a position at time `t` must look up the segment per agent; the implementation derives the segment index from the number of waypoints before `t`, which is exact because each row is strictly increasing.
+
+## D-012 — Formation density convention
+
+**Date:** 2026-10-21  
+**Status:** Accepted
+
+**Decision:** Every formation generator fills the cube `[-1, 1]^3` with a spatially uniform density of `N/8` points per unit volume. For the grid this means each axis is sampled with `linspace(-1, 1, count)` regardless of the sample count.
+
+**Rationale:** `ALGORITHMS.md` warns against treating visually similar shapes as identical distributions. If the grid occupied a smaller region than the sphere, any distance or density comparison would be biased by the sampling rule rather than by the formation. Holding the density fixed makes the comparison about the formation.
+
+**Consequences:** When `N` has no exact three-way factorization, the grid falls back to a near-cubic box with `a·b·c ≥ N` and keeps the first `N` points in `z`-major order, which leaves one partially filled slab. The rule is deterministic and documented in `ALGORITHMS.md`.
+
 ## Open decisions
 
 - Whether and when to publish a release on PyPI under the `swarmlab-formations` distribution name.
 - Whether `CITATION.cff` and `CHANGELOG.md` are added at the research milestone or earlier.
-- Whether the first playground is a script, a notebook, or both.
+- Whether a notebook front end is added alongside the phase runners.
 - Which Python versions beyond 3.12 and 3.13 enter the CI matrix.
 
 ## New record template

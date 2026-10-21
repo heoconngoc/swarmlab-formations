@@ -1,7 +1,8 @@
 # Roadmap
 
-**Status:** Approved · Phase 0 in progress. Durations are rough planning ranges in working time,
-not deadlines; they are re-baselined with measured evidence after Phase 1.
+**Status:** Approved · Phase 0 complete, Phase 1 implemented and awaiting exit-gate review.
+Durations are rough planning ranges in working time, not deadlines; they are re-baselined with
+measured evidence after Phase 1.
 
 ## Phase 0 — Foundation and specifications
 
@@ -12,6 +13,8 @@ not deadlines; they are re-baselined with measured evidence after Phase 1.
 **Exit gate:** Documents approved; reproducible environment and basic tests verified; `STATUS.md` updated.
 
 ## Phase 1 — Formation Playground (about 1–2 weeks)
+
+**Status:** Implemented; exit gate pending human review.
 
 **Learn:** Coordinate systems, vectors, Euclidean distance, point sampling, interpolation.
 

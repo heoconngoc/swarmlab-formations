@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Proposed design, not an implemented directory tree.
+**Status:** Implemented for Phase 1. Later phases follow the contracts below.
 
 ## Design rule
 
@@ -37,23 +37,65 @@ Use SI-like units when meaningful: meters and seconds. Early formation coordinat
 ## Package structure
 
 The distribution name on PyPI is `swarmlab-formations`; the import package name is `swarmlab`
-(see `DECISIONS.md` D-008). The layout below is the target structure; only the package skeleton
-exists today.
+(see `DECISIONS.md` D-008). The layout below is the implemented structure.
 
 ```text
 src/swarmlab/
-  __init__.py
+  __init__.py          # public data contracts only; never imports the viewer
   py.typed
-  models.py
+  models.py            # Scenario, Assignment, Trajectory, Evaluation, Constraints
+  formations/
+    __init__.py        # FORMATIONS registry
+    grid.py            # rectangular lattice
+    sphere.py          # Fibonacci-lattice sphere
+    cube.py            # cube-surface projection
+  assignment/
+    __init__.py
+    random.py          # seeded random permutation (Phase 1 baseline)
+  trajectories/
+    __init__.py
+    linear.py          # straight-line baseline
+    interpolate.py     # position sampling at an arbitrary time
+  evaluation/
+    __init__.py
+    metrics.py         # travel lengths, makespan
+  experiments/
+    __init__.py
+    phase1.py          # Phase 1 runner and command line entry point
+  visualization/
+    __init__.py
+    viewer.py          # Plotly figure and HTML export
+tests/
+  test_models.py
+  test_smoke.py
   formations/
   assignment/
   trajectories/
   evaluation/
-  experiments/
   visualization/
-tests/
-experiments/
+  experiments/
+experiments/           # generated result records, not source code
 ```
+
+### Module placement
+
+| Module | Owns | Must not |
+| --- | --- | --- |
+| `models.py` | Data contracts, validation, immutability rules | Any algorithm or rendering logic |
+| `formations/` | Deterministic coordinate sets | Assignment or time |
+| `assignment/` | Bijection from agents to targets | Geometry of the paths |
+| `trajectories/` | Waypoints and their times | Metrics or rendering |
+| `evaluation/` | Scalar and per-agent measurements | Modification of trajectories |
+| `experiments/` | Orchestration, seeds, reporting, CLI | Algorithm implementations |
+| `visualization/` | Plotly figures and HTML export | Authoritative metric calculation |
+
+Two boundary rules are enforced by tests rather than by convention:
+
+- The numerical core never imports Plotly. `tests/experiments/test_phase1.py` runs a
+  subprocess that imports `swarmlab` and `swarmlab.experiments.phase1` and asserts that
+  `plotly` is absent from `sys.modules`.
+- The top-level `swarmlab/__init__.py` re-exports the data contracts only, so
+  `import swarmlab` never pulls in the viewer.
 
 ## Dependency boundaries
 

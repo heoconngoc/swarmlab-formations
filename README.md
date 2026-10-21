@@ -7,9 +7,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-pre--alpha-lightgrey.svg)](docs/STATUS.md)
 
-> **Status: pre-alpha — documentation-first.**
-> This repository contains specifications, a decision log, and a minimal Python package skeleton.
-> No algorithm is implemented yet, and **no result here has been measured**.
+> **Status: pre-alpha — Phase 1 implemented.**
+> The formation playground runs end to end: deterministic formations, a seeded random
+> assignment, linear trajectories, travel metrics, and an interactive Plotly view.
+> The baseline is explicitly **not collision-safe**, and no physical claim is made.
 > [Status](docs/STATUS.md) records what is actually complete.
 
 SwarmLab is an algorithms-first learning and experimentation project. It studies how many
@@ -53,8 +54,8 @@ layer, never the source of a metric.
 
 | Phase | Focus | Status |
 | --- | --- | --- |
-| 0 | Foundation and specifications | in progress |
-| 1 | Formation playground (50-100 agents, linear trajectories, Plotly) | planned |
+| 0 | Foundation and specifications | complete |
+| 1 | Formation playground (50-100 agents, linear trajectories, Plotly) | implemented, exit gate pending |
 | 2 | Assignment: random, greedy, exact, SciPy reference | planned |
 | 3 | Collision analysis: analytic continuous-time separation | planned |
 | 4 | Collision-aware planning baseline | planned |
@@ -73,10 +74,21 @@ uv run pytest             # run the test suite
 uv run ruff check .       # lint
 ```
 
-**What works today:** the environment builds, the test suite runs, and the linter passes.
-**What does not exist yet:** there is no scenario generator, no assignment solver, and no
-trajectory planner. The first runnable demo arrives in Phase 1. Do not infer functionality from
-this document.
+Run the Phase 1 playground:
+
+```bash
+uv run swarmlab-demo --n 100 --seed 42 --source grid --target sphere
+```
+
+The command prints a short report and writes an interactive HTML animation. Add `--no-html` to
+skip the file, or `--help` to list every option. The same runner is available as
+`python -m swarmlab.experiments.phase1`.
+
+**What works today:** deterministic grid, sphere, and cube-surface formations; a seeded random
+assignment; straight-line trajectories with travel-length and makespan metrics; an interactive
+Plotly viewer; and 89 tests. **What does not exist yet:** an assignment optimizer, collision
+detection, and collision-aware planning, which are Phases 2 to 4. The Phase 1 assignment is
+random by design and the result is explicitly labelled **not collision-safe**.
 
 ## Repository layout
 

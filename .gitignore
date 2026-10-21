@@ -34,3 +34,6 @@ results/
 figures/
 *.html
 !docs/**/*.html
+
+# Personal study notes (Vietnamese). Never committed: local learning material.
+HUONG_DAN.md

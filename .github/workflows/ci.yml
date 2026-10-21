@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: lint (py${{ matrix.python-version }})
+  verify:
+    name: verify (py${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -31,19 +31,4 @@ jobs:
       - run: uv sync --all-extras --locked
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-
-  test:
-    name: test (py${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.12", "3.13"]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.0
-        with:
-          python-version: ${{ matrix.python-version }}
-          enable-cache: true
-      - run: uv sync --all-extras --locked
       - run: uv run pytest --cov=swarmlab --cov-report=term-missing

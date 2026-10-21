@@ -4,6 +4,7 @@
 **Stage:** Pre-alpha — documentation approved, repository bootstrapped  
 **Current phase:** Phase 0 (scaffolding)  
 **GitHub repository:** https://github.com/heoconngoc/swarmlab-formations (public)  
+**Continuous integration:** Green on the initial run — lint, format, and tests on Python 3.12 and 3.13  
 **Implementation:** Package skeleton only; no algorithms implemented
 
 ## Approved direction
@@ -33,14 +34,12 @@
 - Experiment matrix, benchmark scripts, and result records (Phase 5).
 - Literature review and any published-method reproduction (Phase 6).
 - `CITATION.cff` and `CHANGELOG.md` (deferred to the research milestone).
-- Continuous integration observed green on GitHub Actions (workflow added; first run pending).
 
 ## Immediate next actions
 
-1. Verify the first GitHub Actions run is green.
+1. Approve the Phase 0 exit gate.
 2. Confirm `uv sync --all-extras` and `uv run pytest` from a clean clone.
-3. Approve the Phase 0 exit gate.
-4. Begin Phase 1: deterministic formation generators and the linear-trajectory baseline.
+3. Begin Phase 1: deterministic formation generators and the linear-trajectory baseline.
 
 ## Blockers / risks
 

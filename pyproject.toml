@@ -45,6 +45,9 @@ Homepage = "https://github.com/heoconngoc/swarmlab-formations"
 Repository = "https://github.com/heoconngoc/swarmlab-formations"
 Issues = "https://github.com/heoconngoc/swarmlab-formations/issues"
 
+[project.scripts]
+swarmlab-demo = "swarmlab.experiments.phase1:main"
+
 [build-system]
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"

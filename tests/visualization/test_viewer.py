@@ -42,6 +42,37 @@ def test_render_transition_rejects_too_few_frames() -> None:
         render_transition(scenario, trajectory, n_frames=1)
 
 
+def test_slider_steps_reference_existing_frames() -> None:
+    """A slider step must name a frame; a float or an index does nothing."""
+    scenario, trajectory = _trajectory()
+    figure = render_transition(scenario, trajectory, n_frames=7)
+
+    frame_names = {frame.name for frame in figure.frames}
+    steps = figure.layout.sliders[0].steps
+
+    assert len(steps) == 7
+    for step in steps:
+        assert step.args[0][0] in frame_names
+
+
+def test_playback_buttons_exist() -> None:
+    scenario, trajectory = _trajectory()
+    figure = render_transition(scenario, trajectory, n_frames=5)
+
+    buttons = figure.layout.updatemenus[0].buttons
+    assert [button.label for button in buttons] == ["Play", "Pause"]
+
+
+def test_frames_move_the_agents() -> None:
+    """Consecutive frames must actually differ, otherwise the slider looks frozen."""
+    scenario, trajectory = _trajectory()
+    figure = render_transition(scenario, trajectory, n_frames=5)
+
+    first = np.asarray(figure.frames[0].data[0].x)
+    last = np.asarray(figure.frames[-1].data[0].x)
+    assert not np.allclose(first, last)
+
+
 def test_save_transition_writes_an_html_file(tmp_path) -> None:
     scenario, trajectory = _trajectory()
     destination = save_transition(scenario, trajectory, tmp_path / "out" / "demo.html", n_frames=5)

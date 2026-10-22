@@ -75,6 +75,11 @@ def render_transition(
     start_time = float(trajectory.times[:, 0].min())
     end_time = float(trajectory.times[:, -1].max())
     frame_times = np.linspace(start_time, end_time, n_frames)
+    # Frame names are the only stable handle on a frame: Plotly sliders and
+    # animation buttons address frames by name, never by index or by time.
+    frame_names = [f"t{index:03d}" for index in range(n_frames)]
+    # Playback advances at roughly real time: T seconds spread over n_frames.
+    frame_duration_ms = max(20, round(1000.0 * (end_time - start_time) / n_frames))
 
     initial = sample_positions(trajectory, start_time)
     path = trajectory.positions[selected_agent]
@@ -87,15 +92,13 @@ def render_transition(
         line={"color": _PATH_COLOR, "width": 4},
     )
 
-    frames = []
-    for time in frame_times:
-        positions = sample_positions(trajectory, float(time))
-        frames.append(
-            go.Frame(
-                data=[_agent_trace(positions, "agents")],
-                name=f"{time:.2f}s",
-            )
+    frames = [
+        go.Frame(
+            data=[_agent_trace(sample_positions(trajectory, float(time)), "agents")],
+            name=name,
         )
+        for name, time in zip(frame_names, frame_times, strict=True)
+    ]
 
     figure = go.Figure(
         data=[_agent_trace(initial, "agents"), path_trace],
@@ -105,7 +108,7 @@ def render_transition(
         title=title
         or (
             f"SwarmLab Phase 1 - N={n_agents}, "
-            f"{scenario.constraints.duration_s:g}s, {scenario.seed=}"
+            f"{scenario.constraints.duration_s:g}s, seed={scenario.seed}"
         ),
         scene={
             "aspectmode": "data",
@@ -115,25 +118,70 @@ def render_transition(
         },
         margin={"l": 0, "r": 0, "b": 0, "t": 60},
         legend={"x": 0.01, "y": 0.99},
-    )
-    figure.update_layout(
         sliders=[
             {
                 "active": 0,
-                "currentvalue": {"prefix": "t = "},
+                "currentvalue": {"prefix": "t = ", "suffix": " s"},
                 "pad": {"t": 40},
                 "x": 0.1,
                 "len": 0.8,
                 "steps": [
                     {
-                        "label": f"{time:.2f}s",
+                        "label": f"{time:.2f}",
                         "method": "animate",
-                        "args": [[time], {"mode": "immediate"}],
+                        "args": [
+                            [name],
+                            {
+                                "mode": "immediate",
+                                "frame": {"duration": 0, "redraw": True},
+                                "transition": {"duration": 0},
+                            },
+                        ],
                     }
-                    for time in frame_times
+                    for name, time in zip(frame_names, frame_times, strict=True)
                 ],
             }
-        ]
+        ],
+        updatemenus=[
+            {
+                "type": "buttons",
+                "showactive": False,
+                "x": 0.1,
+                "y": -0.05,
+                "xanchor": "right",
+                "yanchor": "top",
+                "pad": {"r": 10, "t": 40},
+                "buttons": [
+                    {
+                        "label": "Play",
+                        "method": "animate",
+                        "args": [
+                            [None],
+                            {
+                                "fromcurrent": True,
+                                "frame": {
+                                    "duration": frame_duration_ms,
+                                    "redraw": True,
+                                },
+                                "transition": {"duration": 0},
+                            },
+                        ],
+                    },
+                    {
+                        "label": "Pause",
+                        "method": "animate",
+                        "args": [
+                            [None],
+                            {
+                                "mode": "immediate",
+                                "frame": {"duration": 0, "redraw": False},
+                                "transition": {"duration": 0},
+                            },
+                        ],
+                    },
+                ],
+            }
+        ],
     )
     figure.add_annotation(
         text=_WARNING,

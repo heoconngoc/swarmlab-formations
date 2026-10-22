@@ -50,6 +50,8 @@ def evaluate_trajectory(
     scenario: Scenario,
     assignment: Assignment,
     trajectory: Trajectory,
+    *,
+    assignment_method: str = "unspecified",
 ) -> Evaluation:
     """Compute the Phase 1 metrics of a trajectory.
 
@@ -57,6 +59,9 @@ def evaluate_trajectory(
         scenario: The transition problem that was solved.
         assignment: The bijection that was used.
         trajectory: The trajectory to evaluate.
+        assignment_method: Name of the solver that produced ``assignment``.
+            Recorded in the metadata. The default ``"unspecified"`` keeps an
+            unknown method visibly unknown instead of guessing ``"random"``.
 
     Returns:
         An :class:`~swarmlab.models.Evaluation` with the total travel length,
@@ -82,7 +87,7 @@ def evaluate_trajectory(
         makespan_s=end_time - start_time,
         n_agents=scenario.n_agents,
         metadata={
-            "assignment_method": "random",
+            "assignment_method": assignment_method,
             "trajectory_method": "linear",
             "interpolation": trajectory.interpolation.value,
             "scenario_seed": str(scenario.seed),

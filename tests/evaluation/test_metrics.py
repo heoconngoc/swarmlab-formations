@@ -38,7 +38,7 @@ def test_evaluate_trajectory_reports_the_totals() -> None:
     scenario = _scenario()
     assignment = random_assignment(scenario.n_agents, seed=2)
     trajectory = linear_trajectory(scenario, assignment)
-    evaluation = evaluate_trajectory(scenario, assignment, trajectory)
+    evaluation = evaluate_trajectory(scenario, assignment, trajectory, assignment_method="random")
 
     per_agent = travel_lengths(trajectory)
     assert evaluation.n_agents == scenario.n_agents
@@ -47,6 +47,17 @@ def test_evaluate_trajectory_reports_the_totals() -> None:
     assert evaluation.makespan_s == pytest.approx(12.0)
     assert evaluation.metadata["assignment_method"] == "random"
     assert evaluation.metadata["trajectory_method"] == "linear"
+
+
+def test_evaluate_trajectory_does_not_guess_the_assignment_method() -> None:
+    """An unknown solver must stay unknown instead of being labelled random."""
+    scenario = _scenario()
+    assignment = random_assignment(scenario.n_agents, seed=2)
+    trajectory = linear_trajectory(scenario, assignment)
+
+    evaluation = evaluate_trajectory(scenario, assignment, trajectory)
+
+    assert evaluation.metadata["assignment_method"] == "unspecified"
 
 
 def test_evaluate_trajectory_rejects_a_mismatched_trajectory() -> None:

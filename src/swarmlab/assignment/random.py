@@ -4,8 +4,9 @@ The assignment is a uniformly drawn permutation of ``range(N)``. The seed
 makes the result reproducible, so an experiment record can be replayed exactly.
 
 This is deliberately *not* an optimizer. A random permutation ignores the
-geometry entirely and therefore produces long, crossing paths. That makes it a
-useful lower bound for the assignment solvers of Phase 2.
+geometry entirely and therefore produces long, crossing paths. Its cost is
+*some* feasible value, so it bounds the optimum from above; it is a baseline,
+not a lower bound, and it says nothing about how much a real solver can gain.
 """
 
 from __future__ import annotations

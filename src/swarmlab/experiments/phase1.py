@@ -116,7 +116,7 @@ def run_phase1(
     )
     assignment = random_assignment(scenario.n_agents, seed)
     trajectory = linear_trajectory(scenario, assignment)
-    evaluation = evaluate_trajectory(scenario, assignment, trajectory)
+    evaluation = evaluate_trajectory(scenario, assignment, trajectory, assignment_method="random")
     return Phase1Result(
         scenario=scenario,
         assignment=assignment,

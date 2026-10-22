@@ -1,8 +1,8 @@
 # Roadmap
 
-**Status:** Approved · Phase 0 complete, Phase 1 implemented and awaiting exit-gate review.
-Durations are rough planning ranges in working time, not deadlines; they are re-baselined with
-measured evidence after Phase 1.
+**Status:** Approved · Phase 0 complete, Phase 1 implemented and reviewed, Phase 2 implemented
+and awaiting exit-gate review. Durations are rough planning ranges in working time, not deadlines;
+they are re-baselined with measured evidence after each phase.
 
 ## Phase 0 — Foundation and specifications
 
@@ -14,7 +14,8 @@ measured evidence after Phase 1.
 
 ## Phase 1 — Formation Playground (about 1–2 weeks)
 
-**Status:** Implemented; exit gate pending human review.
+**Status:** Implemented and reviewed; two post-review defects (sphere angular step, dead time
+slider) were found and fixed on 2026-10-22. See `STATUS.md`.
 
 **Learn:** Coordinate systems, vectors, Euclidean distance, point sampling, interpolation.
 
@@ -25,6 +26,9 @@ measured evidence after Phase 1.
 **Exit gate:** Re-runnable example and tests; visualization visibly labeled **not collision-safe**.
 
 ## Phase 2 — Assignment (about 2–3 weeks)
+
+**Status:** Implemented; exit gate pending human review. The recorded benchmark is
+`experiments/records/phase2_sweep_8c8a9e2.csv`, summarised in `EXPERIMENTS.md`.
 
 **Learn:** Cost matrices, permutations, greedy limitations, bipartite matching, Hungarian algorithm, asymptotic analysis.
 

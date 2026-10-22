@@ -7,10 +7,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-pre--alpha-lightgrey.svg)](docs/STATUS.md)
 
-> **Status: pre-alpha — Phase 1 implemented.**
-> The formation playground runs end to end: deterministic formations, a seeded random
-> assignment, linear trajectories, travel metrics, and an interactive Plotly view.
-> The baseline is explicitly **not collision-safe**, and no physical claim is made.
+> **Status: pre-alpha — Phase 2 implemented.**
+> Phases 1 and 2 run end to end: deterministic formations, random and optimized assignment
+> (greedy, educational Hungarian, SciPy reference), linear trajectories, travel metrics,
+> interactive Plotly views, and a repeatable benchmark harness.
+> Every result is explicitly **not collision-safe**, and no physical claim is made.
 > [Status](docs/STATUS.md) records what is actually complete.
 
 SwarmLab is an algorithms-first learning and experimentation project. It studies how many
@@ -55,8 +56,8 @@ layer, never the source of a metric.
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | Foundation and specifications | complete |
-| 1 | Formation playground (50-100 agents, linear trajectories, Plotly) | implemented, exit gate pending |
-| 2 | Assignment: random, greedy, exact, SciPy reference | planned |
+| 1 | Formation playground (50-100 agents, linear trajectories, Plotly) | implemented and reviewed |
+| 2 | Assignment: random, greedy, exact, SciPy reference | implemented, exit gate pending |
 | 3 | Collision analysis: analytic continuous-time separation | planned |
 | 4 | Collision-aware planning baseline | planned |
 | 5 | Scalability and benchmark matrix (N up to 1000) | planned |
@@ -84,11 +85,28 @@ The command prints a short report and writes an interactive HTML animation. Add 
 skip the file, or `--help` to list every option. The same runner is available as
 `python -m swarmlab.experiments.phase1`.
 
-**What works today:** deterministic grid, sphere, and cube-surface formations; a seeded random
-assignment; straight-line trajectories with travel-length and makespan metrics; an interactive
-Plotly viewer; and 89 tests. **What does not exist yet:** an assignment optimizer, collision
-detection, and collision-aware planning, which are Phases 2 to 4. The Phase 1 assignment is
-random by design and the result is explicitly labelled **not collision-safe**.
+Compare the Phase 2 assignment solvers:
+
+```bash
+# one scenario: cost, optimality gap, and timing for every method
+uv run swarmlab-assign --n 100 --seed 0 --html results/compare.html
+
+# repeatable benchmark: sizes x seeds, CSV record plus cost/runtime curves
+uv run swarmlab-assign --sweep 50,100,250,500,1000 --seeds 0,1,2 --repeats 7 \
+  --csv results/sweep.csv --html results/curves.html
+```
+
+The single-run figure draws the straight paths of each assignment side by side, so a random
+permutation and an optimal one can be compared directly. The sweep figure plots cost and solver
+time against `N`. The recorded Phase 2 run is
+[`experiments/records/phase2_sweep_8c8a9e2.csv`](experiments/records/phase2_sweep_8c8a9e2.csv).
+
+**What works today:** deterministic grid, sphere, and cube-surface formations; seeded random,
+two greedy, and two exact assignment solvers; Euclidean and squared-distance objectives;
+straight-line trajectories with travel-length and makespan metrics; interactive Plotly views;
+a benchmark runner with CSV records; and 206 tests. **What does not exist yet:** collision
+detection and collision-aware planning, which are Phases 3 and 4. Every assignment shown here is
+cost-optimal at best and explicitly labelled **not collision-safe**.
 
 ## Repository layout
 
@@ -144,13 +162,14 @@ MIT - see [LICENSE](LICENSE). Code contributed after this point is released unde
 **Is this a system that flies drones?** No. Agents are idealized points in a simulated 3D
 workspace. No hardware, radio, or flight-control code exists in this repository.
 
-**Is the output collision-safe?** No. The Phase 1 baseline is explicitly labelled
-**not collision-safe**. Analytic continuous-time separation checking is planned for Phase 3, and
+**Is the output collision-safe?** No. Every current result is explicitly labelled
+**not collision-safe**, including the cost-optimal assignments: minimizing travel distance says
+nothing about separation. Analytic continuous-time separation checking is planned for Phase 3, and
 collision-aware planning for Phase 4. Nothing here is a safety guarantee about physical drones.
 
 **Does this project contain original research?** Not yet. Phase 6 reproduces a published method
 before any hypothesis is tested. Novelty is not a goal.
 
-**Where do benchmark results live?** `experiments/` holds versioned configs and machine-readable
-records. Large raw outputs are regenerable and are not committed by default, per
+**Where do benchmark results live?** `experiments/records/` holds small committed CSV records;
+`results/` holds regenerable figures and datasets and is git-ignored, per
 [Development](docs/DEVELOPMENT.md) and [Experiments](docs/EXPERIMENTS.md).

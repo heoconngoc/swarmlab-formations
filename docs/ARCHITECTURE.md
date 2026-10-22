@@ -50,8 +50,12 @@ src/swarmlab/
     sphere.py          # Fibonacci-lattice sphere
     cube.py            # cube-surface projection
   assignment/
-    __init__.py
+    __init__.py        # MATRIX_SOLVERS registry
+    costs.py           # objective definitions: dense (N, N) cost matrix
     random.py          # seeded random permutation (Phase 1 baseline)
+    greedy.py          # agent-order and cheapest-pair heuristics
+    exact.py           # brute force (N <= 8) and educational Hungarian
+    reference.py       # SciPy linear_sum_assignment wrapper
   trajectories/
     __init__.py
     linear.py          # straight-line baseline
@@ -62,9 +66,11 @@ src/swarmlab/
   experiments/
     __init__.py
     phase1.py          # Phase 1 runner and command line entry point
+    phase2.py          # assignment comparison runner, sweep, CSV export
   visualization/
     __init__.py
-    viewer.py          # Plotly figure and HTML export
+    viewer.py          # Plotly animation and HTML export
+    comparison.py      # side-by-side paths, cost/runtime curves
 tests/
   test_models.py
   test_smoke.py
@@ -74,7 +80,8 @@ tests/
   evaluation/
   visualization/
   experiments/
-experiments/           # generated result records, not source code
+experiments/           # versioned configs and small result records
+results/               # generated figures and datasets, git-ignored
 ```
 
 ### Module placement
@@ -91,8 +98,8 @@ experiments/           # generated result records, not source code
 
 Two boundary rules are enforced by tests rather than by convention:
 
-- The numerical core never imports Plotly. `tests/experiments/test_phase1.py` runs a
-  subprocess that imports `swarmlab` and `swarmlab.experiments.phase1` and asserts that
+- The numerical core never imports Plotly. `tests/experiments/test_phase1.py` and
+  `tests/experiments/test_phase2.py` run subprocesses that import the phase runners and assert that
   `plotly` is absent from `sys.modules`.
 - The top-level `swarmlab/__init__.py` re-exports the data contracts only, so
   `import swarmlab` never pulls in the viewer.
@@ -107,17 +114,30 @@ Two boundary rules are enforced by tests rather than by convention:
 
 ## Performance expectations
 
-Measured on the development machine (Python 3.12, NumPy 2.5, SciPy 1.18) while bootstrapping the
-repository:
+Measured on the development machine (Apple silicon, macOS, Python 3.12, NumPy 2.5, SciPy 1.18).
+The assignment rows are medians of 7 timed calls, recorded in
+[`experiments/records/phase2_sweep_8c8a9e2.csv`](../experiments/records/phase2_sweep_8c8a9e2.csv).
 
 | Operation | Scale | Observed time |
 | --- | --- | --- |
-| `scipy.optimize.linear_sum_assignment` | N = 1000, dense | ~30 ms |
+| `euclidean_distance_costs` (dense matrix) | N = 1000 | ~17 ms |
+| `random` permutation | N = 1000 | ~0.03 ms |
+| `greedy` (agent order) | N = 1000 | ~2 ms |
+| `greedy_pair` (cheapest pair first) | N = 1000 | ~218 ms |
+| Educational `hungarian` | N = 250 | ~16 ms |
+| Educational `hungarian` | N = 1000 | ~425 ms |
+| SciPy `linear_sum_assignment` | N = 1000, dense | ~23 ms |
 | Analytic separation, vectorized over all agent pairs | N = 1000 (499,500 pairs) | ~31 ms |
 | Same separation math, Python double loop | N = 250 | ~108 ms |
 
-The last row extrapolates to roughly 28 s at N = 1000 with four segment pairs per agent pair,
-which is too slow for a benchmark matrix of repeated seeds. Consequences:
+The assignment rows show that the asymptotic class is not the whole story: `greedy_pair` is
+quadratic but slower than the cubic reference up to `N = 1000`, because its Python scan and
+`O(N² log N)` sort dominate, while SciPy's cubic loop is compiled. The educational Hungarian
+solver costs about 18 times the reference at `N = 1000`; both still finish in under a second, so
+neither is a bottleneck for Phase 3.
+
+The separation double loop extrapolates to roughly 28 s at N = 1000 with four segment pairs per
+agent pair, which is too slow for a benchmark matrix of repeated seeds. Consequences:
 
 - The collision evaluator **must** be vectorized over agent pairs. Scalar loops are acceptable
   only in tests and in the educational implementations of Phase 3.

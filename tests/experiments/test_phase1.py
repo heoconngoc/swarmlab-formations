@@ -12,7 +12,7 @@ import pytest
 
 from swarmlab.experiments.phase1 import build_scenario, format_report, main, run_phase1
 
-_SRC = Path(__file__).resolve().parents[1] / "src"
+_SRC = Path(__file__).resolve().parents[2] / "src"
 
 
 def test_build_scenario_uses_the_requested_formations() -> None:

@@ -47,6 +47,7 @@ Issues = "https://github.com/heoconngoc/swarmlab-formations/issues"
 
 [project.scripts]
 swarmlab-demo = "swarmlab.experiments.phase1:main"
+swarmlab-assign = "swarmlab.experiments.phase2:main"
 
 [build-system]
 requires = ["hatchling>=1.27"]
